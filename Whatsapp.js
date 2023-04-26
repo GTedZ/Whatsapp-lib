@@ -41,7 +41,7 @@ class Whatsapp extends EventEmitter {
     }
 
     open_webhook_verification(path, verify_token) {
-        this.app.listen(path, (req, res) => {
+        this.app.get(path, (req, res) => {
             if (
                 req.query['hub.mode'] == 'subscribe' &&
                 req.query['hub.verify_token'] == verify_token
