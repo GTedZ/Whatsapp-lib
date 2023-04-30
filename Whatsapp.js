@@ -27,7 +27,10 @@ class Whatsapp extends EventEmitter {
 
         this.set_API_version(API_version);
 
-        this.whatsapp_headers = { Authorization: this.AccessToken };
+        this.whatsapp_headers = {
+            'Content-Type': 'application/json',
+            access_token: `${this.AccessToken}`
+        };
 
         this.set_errorHandling(handle_errors);
     }
@@ -73,7 +76,7 @@ class Whatsapp extends EventEmitter {
     }
 
     sendMessage(phoneNumber_or_waID, textBody, messageID_reply = undefined) {
-        const URL = this.api + this.API_version + '/' + this.from_phone_number_id + '/messages';
+        const URL = this.api + this.API_version + '/' + this.from_phone_number_id + '/messages' + '?access_token=' + this.AccessToken;
 
         const payload = {
             "messaging_product": "whatsapp",
@@ -91,16 +94,36 @@ class Whatsapp extends EventEmitter {
         return request('POST', URL, payload)
     }
 
+    sendTemplate(phoneNumber_or_waID) {
+        const URL = this.api + this.API_version + '/' + this.from_phone_number_id + '/messages' + '?access_token=' + this.AccessToken;
+
+        const payload = {
+            "messaging_product": "whatsapp",
+            "to": phoneNumber_or_waID,
+            "type": "template",
+            "template": { "name": "hello_world", "language": { "code": "en_US" } }
+        }
+
+        return request('POST', URL, payload);
+    }
+
 }
 
 async function request(method, url, payload) {
     method = method.toLowerCase();
 
-    return method == 'get'
-        ?
-        axios[method](url, { headers: this.whatsapp_headers })
-        :
-        axios[method](url, payload, { headers: this.whatsapp_headers })
+    try {
+        const response = await (method == 'get'
+            ?
+            axios[method](url, { headers: this.whatsapp_headers })
+            :
+            axios[method](url, payload, { headers: this.whatsapp_headers })
+        );
+
+        return response.data;
+    } catch (err) {
+        return err.response.data;
+    }
 }
 
 function prepContext(messageID_reply) {
