@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-lib",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This is a Node.JS library built to simplify using the Whatsapp Cloud API",
   "main": "main.js",
   "scripts": {
